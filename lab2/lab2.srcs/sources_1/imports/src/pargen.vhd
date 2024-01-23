@@ -25,8 +25,8 @@ begin
       parity2 := '0';
       par <= '0';
     elsif rising_edge(mclk) then
-        parity1 := parity(indata1);
-        parity2 := parity(indata2);
+        parity(indata1, parity1);
+        parity(indata2, parity2);
       par <= parity1 xor parity2;
     end if;
   end process;
