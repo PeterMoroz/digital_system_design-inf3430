@@ -13,8 +13,8 @@ entity pargen is
 end pargen;
 
 architecture rtl1 of pargen is 
-    function parity(indata: std_logic_vector(15 downto 0)) return std_logic is
-        variable result : std_logic := 'U';
+    procedure parity(indata: in std_logic_vector(15 downto 0);
+                    result: inout std_logic) is
     begin
         result := '0';
         for i in indata'range loop
@@ -22,17 +22,15 @@ architecture rtl1 of pargen is
                 result := not result;
             end if;
         end loop;
-        return result;
     end parity;
     
-    function parity(indata: unsigned(15 downto 0)) return std_logic is
-        variable result : std_logic := '0';
+    procedure parity(indata: in unsigned(15 downto 0);
+                    result: inout std_logic) is
     begin
         result := '0';
         for i in indata'range loop
             result := result xor indata(i);
         end loop;
-        return result;
     end parity;
     
 begin  
@@ -44,8 +42,8 @@ begin
       parity2 := '0';
       par <= '0';
     elsif rising_edge(mclk) then
-        parity1 := parity(indata1);
-        parity2 := parity(indata2);
+        parity(indata1, parity1);
+        parity(indata2, parity2);
       par <= parity1 xor parity2;
     end if;
   end process;
