@@ -49,7 +49,16 @@ architecture Behavioral of tb_seg7model is
     );
     end component;
     
+    component seg7encoder
+    port (
+        hexnum : in std_logic_vector(3 downto 0);
+        decpoint : in std_logic;
+        segments : out std_logic_vector(7 downto 0) 
+    );
+    end component;
+    
     signal an : std_logic_vector(3 downto 0) := "XXXX";
+    signal num : std_logic_vector(3 downto 0) := "XXXX";
     signal seg : std_logic_vector(7 downto 0) := "XXXXXXXX";
     signal dig0 : std_logic_vector(3 downto 0) := "XXXX";
     signal dig1 : std_logic_vector(3 downto 0) := "XXXX";
@@ -60,14 +69,19 @@ architecture Behavioral of tb_seg7model is
     type digit_selector is array(0 to 3) of std_logic_vector(3 downto 0);
        
 begin
-
-    uut: seg7model port map(
+    uut0: seg7model port map(
         a_n => an,
         abcdefgdec_n => seg,
         disp0 => dig0,
         disp1 => dig1,
         disp2 => dig2,
         disp3 => dig3
+    );
+    
+    uut1: seg7encoder port map (
+        hexnum => num,
+        decpoint => '0',
+        segments => seg        
     );
     
     stimuli: process
@@ -85,7 +99,8 @@ begin
             an <= dig_selector(i);
             wait for 10 ns;
             for j in 0 to 15 loop             
-               seg <= seg7_digits_values(j) & '1';
+               -- seg <= seg7_digits_values(j) & '1';
+               num <= std_logic_vector(to_unsigned(j, num'length));
                 wait for 10 ns;
             end loop;
         end loop;
