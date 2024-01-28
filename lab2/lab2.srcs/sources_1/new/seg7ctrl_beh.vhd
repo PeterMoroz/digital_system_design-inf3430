@@ -23,6 +23,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+use IEEE.std_logic_unsigned.all;
+
 architecture Behavioral of seg7ctrl is
 
     component seg7encoder
@@ -32,9 +34,13 @@ architecture Behavioral of seg7ctrl is
         segments : out std_logic_vector(7 downto 0)
     );
     end component;
+    
+--    signal refresh_counter: std_logic_vector(19 downto 0);
+--    signal activation_counter: std_logic_vector(1 downto 0);
 
-    signal curr_dig_num : integer range 0 to 3 := 0;
-    signal segments0 : std_logic_vector(7 downto 0) := "UUUUUUUU"; 
+    signal clock_counter : integer := 0;
+    signal digit_selector : integer range 0 to 3 := 0;
+    signal segments0 : std_logic_vector(7 downto 0) := "UUUUUUUU";
     signal segments1 : std_logic_vector(7 downto 0) := "UUUUUUUU";
     signal segments2 : std_logic_vector(7 downto 0) := "UUUUUUUU";
     signal segments3 : std_logic_vector(7 downto 0) := "UUUUUUUU";
@@ -45,7 +51,7 @@ begin
         hexnum => d0,
         decpoint => dec(0),
         segments => segments0
-    ); 
+    );
     
     encoder1: seg7encoder port map(
         hexnum => d1,
@@ -65,34 +71,50 @@ begin
         segments => segments3
     );
     
-    count: process(mclk, reset)
+--    process(mclk, reset)
+--    begin
+--        if (reset = '1') then
+--            refresh_counter <= (others => '0');
+--        elsif (rising_edge(mclk)) then
+--            refresh_counter <= refresh_counter + 1;
+--        end if;
+--    end process;
+    
+--    activation_counter <= refresh_counter(19 downto 18);
+
+--    with activation_counter select
+--        abcdefgdec_n <= segments0 when "00",
+--                        segments1 when "01",
+--                        segments2 when "10",
+--                        segments3 when "11",
+--                        "UUUUUUUU" when others;
+
+--    with activation_counter select
+--        a_n <= "1110" when "00",
+--                "1101" when "01",
+--                "1011" when "10",
+--                "0111" when "11",
+--                "UUUU" when others;
+
+    process(mclk, reset)
     begin
         if (reset = '1') then
-            curr_dig_num <= 0;
+            clock_counter <= 0;
         elsif (rising_edge(mclk)) then
-            if (curr_dig_num < 3) then
-                curr_dig_num <= curr_dig_num + 1;
-            else
-                curr_dig_num <= 0;
-            end if;
+            clock_counter <= clock_counter + 1;
         end if;
     end process;
-           
-    with curr_dig_num select
+    
+    digit_selector <= clock_counter mod 4;
+
+    with digit_selector select
         abcdefgdec_n <= segments0 when 0,
                         segments1 when 1,
                         segments2 when 2,
                         segments3 when 3,
                         "UUUUUUUU" when others;
 
---    with curr_dig_num select
---        a_n <= "0001" when 0,
---                "0010" when 1,
---                "0100" when 2,
---                "1000" when 3,
---                "UUUU" when others;
-
-    with curr_dig_num select
+    with digit_selector select
         a_n <= "1110" when 0,
                 "1101" when 1,
                 "1011" when 2,

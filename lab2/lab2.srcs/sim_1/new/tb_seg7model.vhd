@@ -101,7 +101,7 @@ begin
             for j in 0 to 15 loop             
                -- seg <= seg7_digits_values(j) & '1';
                num <= std_logic_vector(to_unsigned(j, num'length));
-                wait for 10 ns;
+               wait for 10 ns;
             end loop;
         end loop;
         wait;

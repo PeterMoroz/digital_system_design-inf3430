@@ -111,7 +111,7 @@ begin
     begin
         reset <= '1';
         wait for 2 * Half_Period;
-        reset <= '0';        
+        reset <= '0';
         for n3 in 0 to 15 loop
             d3 <= std_logic_vector(to_unsigned(n3, d3'length));
             for n2 in 0 to 15 loop
@@ -120,7 +120,8 @@ begin
                     d1 <= std_logic_vector(to_unsigned(n1, d1'length));
                     for n0 in 0 to 15 loop
                         d0 <= std_logic_vector(to_unsigned(n0, d0'length));
-                        wait for 2 * 4 * Half_Period;
+                        -- wait for 2 * Half_Period * 250 * 4;
+                        wait for 100 ms;
                     end loop; 
                 end loop; 
             end loop;
